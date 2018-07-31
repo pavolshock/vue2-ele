@@ -2,14 +2,14 @@
   <div class="goods">
     <div class="menu-wrapper" ref="menuWrapper">
       <ul>
-        <li v-for="item in goods.data" class="menu-item border-1px">
+        <li v-for="(item,index) in goods.data" class="menu-item border-1px" :class="{'current': currentIndex === index}" @click="selectMenu(index)">
           <span class="name"><i class="icon" v-show="item.type>0" :class="classMap[item.type]"></i>{{item.name}}</span>
         </li>
       </ul>
     </div>
     <div class="foods-wrapper" ref="foodsWrapper">
       <ul>
-        <li class="food-list food-list-hook" v-for="item in goods.data">
+        <li class="food-list food-list-hook" v-for="item in goods.data" ref="foodlist">
           <h1 class="food-class-name">{{item.name}}</h1>
           <ul>
             <li v-for="food in item.foods" class="food-item border-1px">
@@ -33,18 +33,25 @@
         </li>
       </ul>
     </div>
+    <shopcart :deliveryPrice="seller.data.deliveryPrice" :minPrice="seller.data.minPrice"></shopcart>
   </div>
 
 </template>
 
 <script>
     import BScroll from 'better-scroll'
+    import shopcart from '../shopcart/shopcart'
     const ERR_OK = 0;
     export default {
       data(){
         return {
-          goods: []
+          goods: [],
+          listHeight: [],
+          scrollY: 0
         }
+      },
+      components: {
+        shopcart
       },
       props: {
         seller: {
@@ -53,9 +60,45 @@
       },
       methods: {
        _initScroll() {
-         this.menuScroll = new BScroll(this.$refs.menuWrapper,{});
-         this.foodsScroll = new BScroll(this.$refs.foodsWrapper,{});
+         this.menuScroll = new BScroll(this.$refs.menuWrapper,{
+           click: true
+         });
+         this.foodsScroll = new BScroll(this.$refs.foodsWrapper,{ probeType: 3 });
+         this.foodsScroll.on('scroll', (pos) => {
+          this.scrollY = Math.abs(Math.round(pos.y));
+         })
+       },
+       _rightScrollHeight () {
+         let foodList;
+         foodList = this.$refs.foodlist;
+         let height = 0;
+         this.listHeight.push(height);
+         for (let i = 0; i < foodList.length; i++) {
+           let item = foodList[i];
+           height+= item.clientHeight;
+           this.listHeight.push(height);
+         }
+         console.log(this.listHeight)
+       },
+       selectMenu(index) {
+        let foodList;
+        foodList = this.$refs.foodlist;
+        let el = foodList[index];
+        this.foodsScroll.scrollToElement(el, 300);
+        console.log(index)
        }
+      },
+      computed: {
+        currentIndex() {
+          for (let i = 0; i < this.listHeight.length ; i++) {
+            let height1 = this.listHeight[i];
+            let height2 = this.listHeight[i+1];
+            if(this.scrollY >= height1 && this.scrollY < height2 || !height2){  // 考虑边界问题
+              return i;
+            }
+          }
+          return 0;
+        }
       },
       created() {
         this.classMap = ['decrease','discount','guarantee','invoice','special'];
@@ -64,6 +107,7 @@
             this.goods = response.body;
             this.$nextTick(() => {
               this._initScroll();
+              this._rightScrollHeight();
             });
         }, response => {
           //error callback
@@ -92,6 +136,12 @@
         line-height: 14px
         padding: 0 12px
         border-1px(rgba(7, 17, 27, 0.1))
+        &.current
+          position: relative
+          background: #fff
+          font-weight: 700
+          margin-top: -1px
+          z-index: 10
         .name
           display: table-cell
           font-size: 12px
@@ -164,6 +214,4 @@
                 text-decoration: line-through
                 font-size: 10px
                 color: rgb(147, 153, 159)
-
-
 </style>

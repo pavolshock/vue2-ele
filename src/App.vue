@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <v-header :seller="seller"></v-header>
+    <v-header :seller="$store.state.seller"></v-header>
     <div class="tab border-1px">
       <div class="tab-item">
-        <router-link to="/goods">商品{{$store.state.seller}}</router-link>
+        <router-link to="/goods">商品</router-link>
       </div>
       <div class="tab-item">
         <router-link to="/ratings">评价</router-link>
@@ -12,7 +12,7 @@
         <router-link to="/seller">商家</router-link>
       </div>
     </div>
-    <router-view :seller="seller"></router-view>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -20,21 +20,19 @@
   import header from './components/header/header'
   const ERR_OK = 0;
   export default {
-    data() {
-      return {
-        seller: {}
-      }
-    },
     components: {
       'v-header': header
     },
     created() {
       this.$http.get('/api/seller').then( response => {
-        if(response.body.errno === ERR_OK)
-          this.seller = response.body;
-    }, response => {
+        if(response.body.errno === ERR_OK){
+          this.$nextTick(function(){
+            this.$store.commit('getseller',response.body)
+          });
+        }
+      }, response => {
         //error callback
-    })
+      })
     }
   }
 </script>

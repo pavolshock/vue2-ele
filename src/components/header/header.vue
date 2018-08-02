@@ -1,41 +1,41 @@
 <template>
     <header id="header">
       <div class="header-top">
-        <div class="avatar" v-if="seller.data">
-          <img :src="seller.data.avatar" width="64" height="64">
+        <div class="avatar" v-if="$store.state.seller.data">
+          <img :src="$store.state.seller.data.avatar" width="64" height="64">
         </div>
-        <div v-if="seller.data" class="content">
+        <div v-if="$store.state.seller.data" class="content">
           <div class="title">
             <span class="brand"></span>
-            <span class="name">{{seller.data.name}}</span>
+            <span class="name">{{$store.state.seller.data.name}}</span>
           </div>
           <div class="description">
-            {{seller.data.description}}/{{seller.data.deliveryTime}}分钟送达
+            {{$store.state.seller.data.description}}/{{$store.state.seller.data.deliveryTime}}分钟送达
           </div>
-          <div v-if="seller.data" class="support">
-            <span class="icon" :class="classMap[seller.data.supports[0].type]"></span>
-            <span class="text">{{seller.data.supports[0].description}}</span>
+          <div v-if="$store.state.seller.data" class="support">
+            <span class="icon" :class="classMap[$store.state.seller.data.supports[0].type]"></span>
+            <span class="text">{{$store.state.seller.data.supports[0].description}}</span>
           </div>
         </div>
-        <div v-if="seller.data" class="support-count" @click="detailShow">
-          <span class="count">{{seller.data.supports.length}}个</span>
+        <div v-if="$store.state.seller.data" class="support-count" @click="detailShow">
+          <span class="count">{{$store.state.seller.data.supports.length}}个</span>
           <i class="icon-keyboard_arrow_right"></i>
         </div>
       </div>
-      <div v-if="seller.data" class="scroll-news" @click="detailShow">
-        <span class="news_title"></span><span class="news_text">{{seller.data.bulletin}}</span>
+      <div v-if="$store.state.seller.data" class="scroll-news" @click="detailShow">
+        <span class="news_title"></span><span class="news_text">{{$store.state.seller.data.bulletin}}</span>
         <i class="icon-keyboard_arrow_right"></i>
       </div>
-      <div v-if="seller.data" class="background">
-        <img :src="seller.data.avatar" width="100%" height="100%">
+      <div v-if="$store.state.seller.data" class="background">
+        <img :src="$store.state.seller.data.avatar" width="100%" height="100%">
       </div>
       <transition name="list">
-        <div v-if="seller.data" class="detail" v-show="detail">
+        <div v-if="$store.state.seller.data" class="detail" v-show="detail">
           <div class="detail-wrapper clearfix">
             <div class="detail-main">
-              <h1 class="name">{{seller.data.name}}</h1>
+              <h1 class="name">{{$store.state.seller.data.name}}</h1>
               <div class="star-wrapper">
-                <star :size="48" :score="seller.data.score"></star>
+                <star :size="48" :score="$store.state.seller.data.score"></star>
               </div>
               <div class="title">
                 <div class="line"></div>
@@ -44,7 +44,7 @@
               </div>
               <div class="supports">
                 <ul>
-                  <li class="supports-item" v-for="item in seller.data.supports">
+                  <li class="supports-item" v-for="item in $store.state.seller.data.supports">
                     <i class="icon" :class="classMap[item.type]"></i>
                     <span class="text">{{item.description}}</span>
                   </li>
@@ -56,7 +56,7 @@
                 <div class="line"></div>
               </div>
               <div class="bulletin">
-                <p class="content">{{seller.data.bulletin}}</p>
+                <p class="content">{{$store.state.seller.data.bulletin}}</p>
               </div>
             </div>
           </div>

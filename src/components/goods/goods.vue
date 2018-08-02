@@ -27,18 +27,22 @@
                   <span class="now">¥{{food.price}}</span>
                   <span v-show="food.oldPrice" class="old">¥{{food.oldPrice}}</span>
                 </div>
+                <div class="select-btn">
+                  <cartcontrol :food = "food"></cartcontrol>
+                </div>
               </div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
-    <shopcart :deliveryPrice="seller.data.deliveryPrice" :minPrice="seller.data.minPrice"></shopcart>
+    <shopcart :select-foods="selectFoods"></shopcart>
   </div>
 
 </template>
 
 <script>
+    import cartcontrol from '../cartcontrol/cartcontrol'
     import BScroll from 'better-scroll'
     import shopcart from '../shopcart/shopcart'
     const ERR_OK = 0;
@@ -51,7 +55,8 @@
         }
       },
       components: {
-        shopcart
+        shopcart,
+        cartcontrol
       },
       props: {
         seller: {
@@ -63,7 +68,7 @@
          this.menuScroll = new BScroll(this.$refs.menuWrapper,{
            click: true
          });
-         this.foodsScroll = new BScroll(this.$refs.foodsWrapper,{ probeType: 3 });
+         this.foodsScroll = new BScroll(this.$refs.foodsWrapper,{ probeType: 3, click: true });
          this.foodsScroll.on('scroll', (pos) => {
           this.scrollY = Math.abs(Math.round(pos.y));
          })
@@ -78,7 +83,7 @@
            height+= item.clientHeight;
            this.listHeight.push(height);
          }
-         console.log(this.listHeight)
+         /*console.log(this.listHeight)*/
        },
        selectMenu(index) {
         let foodList;
@@ -98,6 +103,22 @@
             }
           }
           return 0;
+        },
+        selectFoods() {
+          let foods = [];
+          /*console.log(JSON.stringify(this.goods))*/
+          if(!this.goods){
+            return foods
+          } else {
+            this.goods.data.forEach((good) => {
+              good.foods.forEach((food) => {
+                if(food.count) {
+                  foods.push(food)
+                }
+              });
+            });
+          }
+          return foods;
         }
       },
       created() {
@@ -214,4 +235,8 @@
                 text-decoration: line-through
                 font-size: 10px
                 color: rgb(147, 153, 159)
+            .select-btn
+              position: absolute
+              right: 0
+              bottom: 12px
 </style>
